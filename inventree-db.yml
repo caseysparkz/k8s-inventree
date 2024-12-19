@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventree-db
+  namespace: inventree
+  labels:
+    app: inventree-db
+spec:
+  ports:
+    - name: 5432-5432
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    app: inventree-db
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: inventree-db
+  namespace: inventree
+spec:
+  accessModes: [ReadWriteMany]
+  resources:
+    requests:
+      storage: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventree-db
+  namespace: inventree
+  labels:
+    app: inventree-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventree-db
+  template:
+    metadata:
+      labels:
+        app: inventree-db
+    spec:
+      containers:
+        - image: docker.io/postgres:13
+          name: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: inventree-db
+              mountPath: /var/lib/postgresql/data
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: inventree
+                  key: INVENTREE_DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: inventree
+                  key: INVENTREE_DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: inventree
+                  key: INVENTREE_DB_PASSWORD
+      volumes:
+        - name: inventree-db
+          persistentVolumeClaim:
+            claimName: inventree-db
+...

@@ -1,0 +1,37 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: inventree
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inventree
+  namespace: inventree
+data:    
+  INVENTREE_DEBUG: 'False'
+  INVENTREE_EXT_VOLUME: '/home/inventree/data'
+  INVENTREE_LOG_LEVEL: 'WARNING'
+  INVENTREE_PLUGINS_ENABLED: 'True'
+  INVENTREE_TAG: 'stable'
+  INVENTREE_WEB_PORT: '1337'  
+  INVENTREE_CACHE_HOST: 'inventree-cache'
+  INVENTREE_CACHE_PORT: '6379'
+  INVENTREE_DB_ENGINE: 'postgresql'
+  INVENTREE_DB_HOST: 'inventree-db'
+  INVENTREE_DB_PORT: '5432'
+  INVENTREE_DB_NAME: 'inventree_db'
+  INVENTREE_DB_USER: 'inventree'
+  INVENTREE_ADMIN_USER: 'inventree'                                             # CHANGEME
+  INVENTREE_ADMIN_EMAIL: 'inventree@localhost'                                  # CHANGEME
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: inventree
+  namespace: inventree
+stringData:    
+  INVENTREE_DB_PASSWORD: 'CHANGEME!'
+  INVENTREE_ADMIN_PASSWORD: 'CHANGEME!'
+...

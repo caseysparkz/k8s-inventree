@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:  
+  name: inventree-worker
+  namespace: inventree
+  labels:
+    app: inventree-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventree-worker
+  strategy:
+    type: Recreate
+  template:
+    metadata:      
+      labels:
+        app: inventree-worker
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: inventree-worker          
+          image: docker.io/inventree/inventree:stable
+          args:
+            - invoke
+            - worker
+          envFrom:
+            - configMapRef:
+                name: inventree          
+            - secretRef:
+                name: inventree          
+          volumeMounts:
+            - name: inventree-data
+              mountPath: /home/inventree/data
+      volumes:
+        - name: inventree-data
+          persistentVolumeClaim:
+            claimName: inventree-data
+...
